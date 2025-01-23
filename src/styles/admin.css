@@ -1,0 +1,18 @@
+.admin {
+    padding: 20px;
+}
+
+.admin-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.tool-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex: 1 1 calc(33.33% - 30px);
+}

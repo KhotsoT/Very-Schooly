@@ -1,0 +1,20 @@
+.students {
+    padding: 20px;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.students-table th,
+.students-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.students-table th {
+    background-color: #0044cc;
+    color: white;
+}
