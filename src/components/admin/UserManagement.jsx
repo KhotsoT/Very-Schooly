@@ -19,6 +19,7 @@ const UserManagement = () => {
     const [showAddUserModal, setShowAddUserModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [userTypeFilter, setUserTypeFilter] = useState('all'); // State for user type filter
 
     const roles = ['all', 'learner', 'educator', 'parent', 'admin', 'principal'];
     const statusOptions = ['pending', 'active', 'inactive', 'suspended'];
@@ -103,6 +104,13 @@ const UserManagement = () => {
         setShowAddUserModal(true);
     };
 
+    const filteredUsers = users.filter(user => {
+        const matchesType = userTypeFilter === 'all' || user.userType === userTypeFilter;
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesType && matchesSearch;
+    });
+
     return (
         <DashboardLayout userType={userType}>
             <div className="space-y-6">
@@ -126,6 +134,21 @@ const UserManagement = () => {
                         Add User
                     </button>
                 </div>
+                {/* User Type Filter Dropdown */}
+                <div className="mb-4">
+                    <label className="mr-2">Filter by User Type:</label>
+                    <select
+                        value={userTypeFilter}
+                        onChange={(e) => setUserTypeFilter(e.target.value)}
+                        className="border rounded p-2"
+                    >
+                        <option value="all">All</option>
+                        <option value="parent">Parent</option>
+                        <option value="educator">Educator</option>
+                        <option value="learner">Learner</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -139,23 +162,16 @@ const UserManagement = () => {
                                     <th className="py-3 px-6 text-left">Email</th>
                                     <th className="py-3 px-6 text-left">User Type</th>
                                     <th className="py-3 px-6 text-left">Status</th>
-                                    <th className="py-3 px-6 text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="text-gray-600 text-sm font-light">
-                                {users.filter(user =>
-                                    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-                                ).map(user => (
+                                {filteredUsers.map(user => (
                                     <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(user)}>
                                         <td className="py-3 px-6">{user.name}</td>
                                         <td className="py-3 px-6">{user.email}</td>
                                         <td className="py-3 px-6">{user.userType}</td>
                                         <td className={`py-3 px-6 font-bold ${user.status === 'active' ? 'text-green-500' : 'text-red-500'}`}>
                                             {user.status}
-                                        </td>
-                                        <td className="py-3 px-6">
-                                            <button onClick={() => handleEditUser(user)} className="text-blue-600 hover:text-blue-800">Edit</button>
                                         </td>
                                     </tr>
                                 ))}
