@@ -5,6 +5,7 @@ import { db, auth } from '../../firebase/config';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AddUserModal from './modals/AddUserModal';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import ConfirmationModal from '../modals/ConfirmationModal';
 
 const UserManagement = () => {
     const [user] = useAuthState(auth); // Get the current user
@@ -16,6 +17,8 @@ const UserManagement = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [error, setError] = useState(null);
     const [showAddUserModal, setShowAddUserModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
     const roles = ['all', 'learner', 'educator', 'parent', 'admin', 'principal'];
     const statusOptions = ['pending', 'active', 'inactive', 'suspended'];
@@ -87,10 +90,16 @@ const UserManagement = () => {
                 console.error('Error deleting user:', error);
             }
         }
+        setShowConfirmationModal(false);
     };
 
     const handleEditUser = (user) => {
         setEditingUser(user);
+        setShowAddUserModal(true);
+    };
+
+    const handleRowClick = (user) => {
+        setSelectedUser(user);
         setShowAddUserModal(true);
     };
 
@@ -108,7 +117,10 @@ const UserManagement = () => {
                         className="border rounded p-2"
                     />
                     <button
-                        onClick={() => setShowAddUserModal(true)}
+                        onClick={() => {
+                            setSelectedUser(null);
+                            setShowAddUserModal(true);
+                        }}
                         className="bg-blue-500 text-white rounded p-2"
                     >
                         Add User
@@ -135,7 +147,7 @@ const UserManagement = () => {
                                     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                     user.email.toLowerCase().includes(searchTerm.toLowerCase())
                                 ).map(user => (
-                                    <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100">
+                                    <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(user)}>
                                         <td className="py-3 px-6">{user.name}</td>
                                         <td className="py-3 px-6">{user.email}</td>
                                         <td className="py-3 px-6">{user.userType}</td>
@@ -144,7 +156,6 @@ const UserManagement = () => {
                                         </td>
                                         <td className="py-3 px-6">
                                             <button onClick={() => handleEditUser(user)} className="text-blue-600 hover:text-blue-800">Edit</button>
-                                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-600 hover:text-red-800 ml-2">Delete</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -156,7 +167,18 @@ const UserManagement = () => {
                     <AddUserModal
                         onClose={() => setShowAddUserModal(false)}
                         onUserAdded={handleAddUser}
-                        initialData={editingUser}
+                        initialData={selectedUser}
+                    />
+                )}
+                {showConfirmationModal && (
+                    <ConfirmationModal
+                        isOpen={showConfirmationModal}
+                        onClose={() => setShowConfirmationModal(false)}
+                        onConfirm={() => handleDeleteUser(selectedUser.id)}
+                        title="Confirm Action"
+                        message={`Are you sure you want to delete ${selectedUser.name}?`}
+                        confirmText="Delete User"
+                        cancelText="Cancel"
                     />
                 )}
             </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { addDoc, collection, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
 
-const AddUserModal = ({ onClose, onUserAdded, initialData, onDelete, userTypes }) => {
+const AddUserModal = ({ onClose, onUserAdded, initialData }) => {
     const [newUser, setNewUser] = useState({
         name: '',
         email: '',
@@ -43,7 +43,7 @@ const AddUserModal = ({ onClose, onUserAdded, initialData, onDelete, userTypes }
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded shadow-lg">
                 <h2 className="text-xl font-semibold mb-4">
-                    {initialData ? 'Edit User' : 'Add New User'}
+                    {initialData ? 'Update User' : 'Add User'}
                 </h2>
                 {error && <div className="text-red-500">{error}</div>}
                 <form onSubmit={handleSubmit}>
@@ -85,11 +85,10 @@ const AddUserModal = ({ onClose, onUserAdded, initialData, onDelete, userTypes }
                         onChange={(e) => setNewUser({ ...newUser, userType: e.target.value })}
                         className="border rounded p-2 mb-2 w-full"
                     >
-                        {userTypes.map(type => (
-                            <option key={type} value={type}>
-                                {type.charAt(0).toUpperCase() + type.slice(1)}
-                            </option>
-                        ))}
+                        <option value="parent">Parent</option>
+                        <option value="educator">Educator</option>
+                        <option value="learner">Learner</option>
+                        <option value="admin">Admin</option>
                     </select>
                     <div className="flex justify-between">
                         <button type="submit" className="bg-blue-500 text-white rounded p-2">
