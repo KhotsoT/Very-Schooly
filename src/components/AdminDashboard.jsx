@@ -1,16 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { db } from '../firebase/config';
+import { collection, getDocs } from 'firebase/firestore';
 import DashboardLayout from './layouts/DashboardLayout';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Bar } from 'react-chartjs-2';
 
 const AdminDashboard = () => {
-    const [stats] = useState({
-        totalStudents: 25,
-        totalTeachers: 10,
-        totalClasses: 15,
-        activeEnrollments: 20
+    const [stats, setStats] = useState({
+        totalStudents: 0,
+        totalTeachers: 0,
+        totalClasses: 0,
+        activeEnrollments: 0
     });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const studentsSnapshot = await getDocs(collection(db, 'users'));
+                const teachersSnapshot = await getDocs(collection(db, 'users'));
+                const classesSnapshot = await getDocs(collection(db, 'classes'));
+                const enrollmentsSnapshot = await getDocs(collection(db, 'enrollments'));
+
+                setStats({
+                    totalStudents: studentsSnapshot.docs.filter(doc => doc.data().userType === 'learner').length,
+                    totalTeachers: teachersSnapshot.docs.filter(doc => doc.data().userType === 'educator').length,
+                    totalClasses: classesSnapshot.docs.length,
+                    activeEnrollments: enrollmentsSnapshot.docs.length
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const menuItems = [
         {
@@ -74,30 +98,27 @@ const AdminDashboard = () => {
 
                 {/* Stats Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-white p-4 rounded-lg shadow">
-                        <h3 className="text-gray-500 text-sm">Total Students</h3>
-                        <p className="text-2xl font-bold">{stats.totalStudents}</p>
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 className="text-gray-500 text-sm font-medium">Total Students</h3>
+                        <p className="text-2xl font-bold mt-2">{stats.totalStudents}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
-                        <h3 className="text-gray-500 text-sm">Total Teachers</h3>
-                        <p className="text-2xl font-bold">{stats.totalTeachers}</p>
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 className="text-gray-500 text-sm font-medium">Total Teachers</h3>
+                        <p className="text-2xl font-bold mt-2">{stats.totalTeachers}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
-                        <h3 className="text-gray-500 text-sm">Total Classes</h3>
-                        <p className="text-2xl font-bold">{stats.totalClasses}</p>
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 className="text-gray-500 text-sm font-medium">Total Classes</h3>
+                        <p className="text-2xl font-bold mt-2">{stats.totalClasses}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
-                        <h3 className="text-gray-500 text-sm">Active Enrollments</h3>
-                        <p className="text-2xl font-bold">{stats.activeEnrollments}</p>
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 className="text-gray-500 text-sm font-medium">Active Enrollments</h3>
+                        <p className="text-2xl font-bold mt-2">{stats.activeEnrollments}</p>
                     </div>
                 </div>
 
                 {/* Chart */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold mb-4">System Overview</h2>
-                    <div className="h-64">
-                        <Bar data={chartData} options={{ maintainAspectRatio: false }} />
-                    </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <Bar data={chartData} options={{ maintainAspectRatio: false }} />
                 </div>
 
                 {/* Quick Actions */}
