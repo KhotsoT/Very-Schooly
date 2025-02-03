@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-// import DashboardLayout from './modals/layouts/DashboardLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Bar } from 'react-chartjs-2';
