@@ -4,8 +4,11 @@ import { db, auth } from '../../firebase/config';
 // import DashboardLayout from '../modals/layouts/DashboardLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AddUserModal from './modals/AddUserModal';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const UserManagement = () => {
+    const [user] = useAuthState(auth); // Get the current user
+    const [userType, setUserType] = useState(null); // State to hold user type
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedRole, setSelectedRole] = useState('all');
@@ -17,6 +20,21 @@ const UserManagement = () => {
     const roles = ['all', 'learner', 'educator', 'parent', 'admin', 'principal'];
     const statusOptions = ['pending', 'active', 'inactive', 'suspended'];
     const userTypes = ['parent', 'educator', 'admin', 'learner', 'principal'];
+
+    useEffect(() => {
+        const fetchUserType = async () => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    setUserType(userDoc.data().userType); // Set user type from Firestore
+                } else {
+                    console.error('User document does not exist');
+                }
+            }
+        };
+
+        fetchUserType();
+    }, [user]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -61,17 +79,25 @@ const UserManagement = () => {
     };
 
     const handleDeleteUser = async (userId) => {
-        try {
-            await deleteDoc(doc(db, 'users', userId));
-            fetchUsers(); // Refresh the user list
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            setError('Failed to delete user');
+        if (window.confirm('Are you sure you want to delete this user?')) {
+            try {
+                await deleteDoc(doc(db, 'users', userId));
+                setUsers(users.filter(user => user.id !== userId));
+            } catch (error) {
+                console.error('Error deleting user:', error);
+            }
         }
     };
 
+    const handleEditUser = (user) => {
+        setEditingUser(user);
+        setShowAddUserModal(true);
+    };
+
+    console.log('Logged In TYPE is ... ---> ', userType);
+
     return (
-        <DashboardLayout userType='admin'>
+        <DashboardLayout userType={userType}>
             <div className="space-y-6">
                 <h2 className="text-2xl font-bold">User Management</h2>
                 {error && <div className="text-red-500">{error}</div>}
@@ -114,7 +140,7 @@ const UserManagement = () => {
                                     <td className="border border-gray-200 p-2">{user.userType}</td>
                                     <td className="border border-gray-200 p-2">{user.status}</td>
                                     <td className="border border-gray-200 p-2">
-                                        <button onClick={() => setEditingUser(user)}>Edit</button>
+                                        <button onClick={() => handleEditUser(user)}>Edit</button>
                                         <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
                                     </td>
                                 </tr>
@@ -126,15 +152,7 @@ const UserManagement = () => {
                     <AddUserModal
                         onClose={() => setShowAddUserModal(false)}
                         onUserAdded={handleAddUser}
-                        userTypes={userTypes}
-                    />
-                )}
-                {editingUser && (
-                    <AddUserModal
-                        onClose={() => setEditingUser(null)}
-                        onUserAdded={handleUpdateUser}
                         initialData={editingUser}
-                        userTypes={userTypes}
                     />
                 )}
             </div>
