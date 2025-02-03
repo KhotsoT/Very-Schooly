@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import DashboardLayout from '../modals/layouts/DashboardLayout';
+// import DashboardLayout from '../modals/layouts/DashboardLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
 import { formatDate } from '../../utils/saSchoolCalendar';
 
 const EducatorReports = () => {

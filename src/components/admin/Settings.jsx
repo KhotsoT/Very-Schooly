@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/config';
 import DashboardLayout from '../layouts/DashboardLayout';
+// import DashboardLayout from '../modals/layouts/DashboardLayout';
+
 
 const Settings = () => {
     const defaultSettings = {

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import DashboardLayout from '../modals/layouts/DashboardLayout';
+// import DashboardLayout from '../modals/layouts/DashboardLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
 import AddClassModal from './modals/AddClassModal';
 
 const ClassManagement = () => {

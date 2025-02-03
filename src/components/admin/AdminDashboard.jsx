@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import DashboardLayout from '../modals/layouts/DashboardLayout';
+// import DashboardLayout from '../modals/layouts/DashboardLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
 import UserManagement from './UserManagement';
 import SystemSettings from './SystemSettings';
 import AuditLogs from './AuditLogs';

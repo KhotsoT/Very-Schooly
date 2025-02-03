@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc, deleteDoc, where, getDoc, setDoc, addDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/config';
-import DashboardLayout from '../modals/layouts/DashboardLayout';
+// import DashboardLayout from '../modals/layouts/DashboardLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
 import AddUserModal from './modals/AddUserModal';
 
 const UserManagement = () => {

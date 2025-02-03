@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import DashboardLayout from '../modals/layouts/DashboardLayout';
+// import DashboardLayout from '../modals/layouts/DashboardLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
 import AddStaffModal from '../modals/AddStaffModal';
 import { useNavigate } from 'react-router-dom';
 

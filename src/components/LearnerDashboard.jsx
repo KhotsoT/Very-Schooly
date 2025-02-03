@@ -1,4 +1,5 @@
-import DashboardLayout from './modals/layouts/DashboardLayout';
+// import DashboardLayout from './modals/layouts/DashboardLayout';
+import DashboardLayout from './layouts/DashboardLayout';
 
 const LearnerDashboard = () => {
     return (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import DashboardLayout from './modals/layouts/DashboardLayout';
+// import DashboardLayout from './modals/layouts/DashboardLayout';
+import DashboardLayout from './layouts/DashboardLayout';
 import { getCurrentTerm, getNextTerm, formatDate } from '../utils/saSchoolCalendar';
 import PerformanceChart from './charts/PerformanceChart';
 import AttendanceChart from './charts/AttendanceChart';
