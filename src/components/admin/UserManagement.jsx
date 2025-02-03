@@ -94,8 +94,6 @@ const UserManagement = () => {
         setShowAddUserModal(true);
     };
 
-    console.log('Logged In TYPE is ... ---> ', userType);
-
     return (
         <DashboardLayout userType={userType}>
             <div className="space-y-6">
@@ -117,36 +115,42 @@ const UserManagement = () => {
                     </button>
                 </div>
                 {loading ? (
-                    <div>Loading...</div>
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                    </div>
                 ) : (
-                    <table className="min-w-full border-collapse border border-gray-200">
-                        <thead>
-                            <tr>
-                                <th className="border border-gray-200 p-2">Name</th>
-                                <th className="border border-gray-200 p-2">Email</th>
-                                <th className="border border-gray-200 p-2">Role</th>
-                                <th className="border border-gray-200 p-2">Status</th>
-                                <th className="border border-gray-200 p-2">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.filter(user =>
-                                user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                user.email.toLowerCase().includes(searchTerm.toLowerCase())
-                            ).map(user => (
-                                <tr key={user.id}>
-                                    <td className="border border-gray-200 p-2">{user.name}</td>
-                                    <td className="border border-gray-200 p-2">{user.email}</td>
-                                    <td className="border border-gray-200 p-2">{user.userType}</td>
-                                    <td className="border border-gray-200 p-2">{user.status}</td>
-                                    <td className="border border-gray-200 p-2">
-                                        <button onClick={() => handleEditUser(user)}>Edit</button>
-                                        <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white border border-gray-300">
+                            <thead>
+                                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                                    <th className="py-3 px-6 text-left">Name</th>
+                                    <th className="py-3 px-6 text-left">Email</th>
+                                    <th className="py-3 px-6 text-left">User Type</th>
+                                    <th className="py-3 px-6 text-left">Status</th>
+                                    <th className="py-3 px-6 text-left">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="text-gray-600 text-sm font-light">
+                                {users.filter(user =>
+                                    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).map(user => (
+                                    <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100">
+                                        <td className="py-3 px-6">{user.name}</td>
+                                        <td className="py-3 px-6">{user.email}</td>
+                                        <td className="py-3 px-6">{user.userType}</td>
+                                        <td className={`py-3 px-6 font-bold ${user.status === 'active' ? 'text-green-500' : 'text-red-500'}`}>
+                                            {user.status}
+                                        </td>
+                                        <td className="py-3 px-6">
+                                            <button onClick={() => handleEditUser(user)} className="text-blue-600 hover:text-blue-800">Edit</button>
+                                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-600 hover:text-red-800 ml-2">Delete</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
                 {showAddUserModal && (
                     <AddUserModal
