@@ -1,10 +1,10 @@
 import DashboardLayout from './modals/layouts/DashboardLayout';
 
-const StudentDashboard = () => {
+const LearnerDashboard = () => {
     return (
-        <DashboardLayout userType="student">
+        <DashboardLayout userType="learner">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <h1 className="text-2xl font-bold col-span-full">Student Dashboard</h1>
+                <h1 className="text-2xl font-bold col-span-full">Learner Dashboard</h1>
                 {/* Overview Card */}
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                     <h2 className="text-xl font-semibold mb-4">Overview</h2>
@@ -58,4 +58,4 @@ const StudentDashboard = () => {
     );
 };
 
-export default StudentDashboard; 
+export default LearnerDashboard; 

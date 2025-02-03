@@ -4,7 +4,7 @@ import { db } from '../../firebase/config';
 import DashboardLayout from '../modals/layouts/DashboardLayout';
 import { formatDate } from '../../utils/saSchoolCalendar';
 
-const TeacherReports = () => {
+const EducatorReports = () => {
     const [selectedReport, setSelectedReport] = useState('attendance');
     const [selectedClass, setSelectedClass] = useState('');
     const [dateRange, setDateRange] = useState({
@@ -172,7 +172,7 @@ const TeacherReports = () => {
     };
 
     return (
-        <DashboardLayout userType="teacher">
+        <DashboardLayout userType="educator">
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h1 className="text-2xl font-bold">Reports</h1>
@@ -255,4 +255,4 @@ const TeacherReports = () => {
     );
 };
 
-export default TeacherReports; 
+export default EducatorReports; 

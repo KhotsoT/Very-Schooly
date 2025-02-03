@@ -9,7 +9,7 @@ import TakeAttendanceModal from './modals/TakeAttendanceModal';
 import AddAssessmentModal from './modals/AddAssessmentModal';
 import { useNavigate } from 'react-router-dom';
 
-const TeacherDashboard = () => {
+const EducatorDashboard = () => {
     const currentTerm = getCurrentTerm();
     const nextTerm = getNextTerm();
     const navigate = useNavigate();
@@ -44,13 +44,13 @@ const TeacherDashboard = () => {
     };
 
     const handleViewReports = () => {
-        navigate('/teacher-dashboard/reports');
+        navigate('/educator-dashboard/reports');
     };
 
     return (
-        <DashboardLayout userType="teacher">
+        <DashboardLayout userType="educator">
             <div className="space-y-6">
-                <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
+                <h1 className="text-2xl font-bold">Educator Dashboard</h1>
                 {/* Quick Actions */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -180,4 +180,4 @@ const TeacherDashboard = () => {
     );
 };
 
-export default TeacherDashboard; 
+export default EducatorDashboard; 

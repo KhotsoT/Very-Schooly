@@ -70,7 +70,7 @@ const UserManagement = () => {
     };
 
     return (
-        <DashboardLayout>
+        <DashboardLayout userType='admin'>
             <div className="space-y-6">
                 <h2 className="text-2xl font-bold">User Management</h2>
                 {error && <div className="text-red-500">{error}</div>}

@@ -2,10 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import SignUp from './components/SignUp';
 import Login from './components/Login';
 import PrivateRoute from './components/PrivateRoute';
-import StudentDashboard from './components/StudentDashboard';
+import LearnerDashboard from './components/LearnerDashboard';
 import ParentDashboard from './components/ParentDashboard';
-import TeacherDashboard from './components/TeacherDashboard';
-import TeacherReports from './components/reports/TeacherReports';
+import EducatorDashboard from './components/EducatorDashboard';
+import EducatorReports from './components/reports/EducatorReports';
 import AdminDashboard from './components/AdminDashboard';
 import PrincipalDashboard from './components/PrincipalDashboard';
 import PrincipalReports from './components/reports/PrincipalReports';
@@ -65,10 +65,10 @@ function App() {
               )
             } />
             <Route
-              path="/student-dashboard/*"
+              path="/learner-dashboard/*"
               element={
-                <PrivateRoute userType="student">
-                  <StudentDashboard />
+                <PrivateRoute userType="learner">
+                  <LearnerDashboard />
                 </PrivateRoute>
               }
             />
@@ -81,18 +81,18 @@ function App() {
               }
             />
             <Route
-              path="/teacher-dashboard/*"
+              path="/educator-dashboard/*"
               element={
-                <PrivateRoute userType="teacher">
-                  <TeacherDashboard />
+                <PrivateRoute userType="educator">
+                  <EducatorDashboard />
                 </PrivateRoute>
               }
             />
             <Route
-              path="/teacher-dashboard/reports"
+              path="/educator-dashboard/reports"
               element={
-                <PrivateRoute userType="teacher">
-                  <TeacherReports />
+                <PrivateRoute userType="educator">
+                  <EducatorReports />
                 </PrivateRoute>
               }
             />
