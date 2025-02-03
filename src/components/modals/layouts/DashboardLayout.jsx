@@ -82,8 +82,16 @@ const DashboardLayout = ({ children, userType }) => {
                                 {sidebarOpen ? <CloseIcon /> : <MenuIcon />}
                             </button>
                             <div className="flex-shrink-0 flex items-center ml-4 lg:ml-0">
-                                <span className="text-xl font-bold text-blue-600 truncate">
-                                    School Management
+                                <span
+                                    className="font-bold text-xl"
+                                    style={{
+                                        background: 'linear-gradient(to right, #2563eb, #60a5fa)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        backgroundClip: 'text'
+                                    }}
+                                >
+                                    Very Schooly
                                 </span>
                             </div>
                         </div>
