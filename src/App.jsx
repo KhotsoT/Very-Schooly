@@ -20,7 +20,7 @@ import UserProfile from './components/profile/UserProfile';
 import UserManagement from './components/admin/UserManagement';
 import AdminClassManagement from './components/admin/ClassManagement';
 import AdminReports from './components/admin/Reports';
-import AdminSettings from './components/admin/Settings';
+import AdminSettings from './components/admin/SystemSettings';
 import RoleVerification from './components/auth/RoleVerification';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/config';
