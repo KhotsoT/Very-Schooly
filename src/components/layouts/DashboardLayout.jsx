@@ -32,6 +32,8 @@ const DashboardLayout = ({ children, userType }) => {
                 return [
                     { title: 'Dashboard', path: '/admin-dashboard' },
                     { title: 'Users', path: '/admin-dashboard/users' },
+                    { title: 'Classes', path: '/admin-dashboard/classes' },
+                    { title: 'Reports', path: '/admin-dashboard/reports' },
                     { title: 'Settings', path: '/admin-dashboard/settings' },
                 ];
             case 'teacher':
