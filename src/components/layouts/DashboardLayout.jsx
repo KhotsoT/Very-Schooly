@@ -57,6 +57,14 @@ const DashboardLayout = ({ children, userType }) => {
                     { title: 'Progress', path: '/parent-dashboard/progress' },
                     { title: 'Messages', path: '/parent-dashboard/messages' },
                 ];
+            case 'principal':
+                return [
+                    { title: 'Dashboard', path: '/principal-dashboard' },
+                    { title: 'Manage Teachers', path: '/principal-dashboard/manage-teachers' },
+                    { title: 'Manage Students', path: '/principal-dashboard/manage-students' },
+                    { title: 'Reports', path: '/principal-dashboard/reports' },
+                    { title: 'Settings', path: '/principal-dashboard/settings' },
+                ];
             default:
                 return [];
         }

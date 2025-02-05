@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import DashboardLayout from './modals/layouts/DashboardLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import { getCurrentTerm, formatDate } from '../utils/saSchoolCalendar';
 
