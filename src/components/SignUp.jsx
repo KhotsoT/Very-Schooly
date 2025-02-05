@@ -56,21 +56,30 @@ const SignUp = () => {
                 address: formData.address,
                 emailVerified: false, // Initially set to false
                 status: 'pending', // Set status to pending
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
             });
 
-            // Send email verification
-            const verificationSent = await handleEmailVerification(user);
-            if (verificationSent) {
-                // Show success alert
-                window.alert('Signup successful! Please check your email for verification.');
-                // Redirect to homepage
-                navigate('/');
+            // Send email verification if userType is not 'learner'
+            if (formData.userType !== 'learner') {
+                const verificationSent = await handleEmailVerification(user);
+                if (verificationSent) {
+                    window.alert('Signup successful! Please check your email for verification.');
+                } else {
+                    setError('Failed to send verification email.');
+                }
             } else {
-                setError('Failed to send verification email.');
+                // If userType is 'learner', set status to active
+                await setDoc(doc(db, 'users', user.uid), {
+                    status: 'active',
+                    emailVerified: true,
+                    updatedAt: new Date().toISOString(),
+                });
+                window.alert('Signup successful! Learner accounts are activated automatically.');
             }
 
+            // Redirect to homepage
+            navigate('/');
             // Optionally sign out the user after signup
             await signOut(auth);
         } catch (error) {
@@ -171,7 +180,6 @@ const SignUp = () => {
                         className="w-full p-2 border rounded"
                         disabled={loading}
                     >
-                        <option value="student">Learner</option>
                         <option value="teacher">Educator</option>
                         <option value="parent">Parent</option>
                         <option value="admin">Admin</option>

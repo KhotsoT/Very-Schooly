@@ -7,6 +7,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { parse } from 'papaparse'; // Importing papaparse for CSV parsing
 import UserUploadTemplate from './UserUploadTemplate'; // Import the new template component
+import { handleEmailVerification } from '../../firebase/config';
 
 const UserManagement = () => {
     const [user] = useAuthState(auth); // Get the current user
@@ -118,7 +119,26 @@ const UserManagement = () => {
 
             // Process each user and add to Firestore
             for (const user of parsedData) {
-                await addDoc(collection(db, 'users'), user);
+                const userRef = doc(db, 'users', user.email); // Assuming email is unique
+                await setDoc(userRef, {
+                    email: user.email,
+                    name: user.name,
+                    surname: user.surname,
+                    idNumber: user.idNumber,
+                    userType: user.userType,
+                    cellphone: user.cellphone,
+                    address: user.address,
+                    emailVerified: user.userType === 'learner', // Set to true if learner
+                    status: user.userType === 'learner' ? 'active' : 'pending', // Set status based on userType
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                });
+
+                // Send email verification if userType is not 'learner'
+                if (user.userType !== 'learner') {
+                    const userCredential = await auth.createUserWithEmailAndPassword(user.email, user.password);
+                    await handleEmailVerification(userCredential.user);
+                }
             }
 
             fetchUsers(); // Refresh the user list

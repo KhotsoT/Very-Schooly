@@ -6,9 +6,14 @@ const UserUploadTemplate = () => {
         // Define the headers for the Excel template
         const headers = [
             { header: 'Name', key: 'name', width: 30 },
+            { header: 'Surname', key: 'surname', width: 30 },
             { header: 'Email', key: 'email', width: 30 },
+            { header: 'Password', key: 'password', width: 20 },
+            { header: 'Confirm Password', key: 'confirmPassword', width: 20 },
+            { header: 'ID Number', key: 'idNumber', width: 20 },
             { header: 'User Type', key: 'userType', width: 20 },
-            { header: 'Status', key: 'status', width: 20 },
+            { header: 'Cellphone', key: 'cellphone', width: 20 },
+            { header: 'Address', key: 'address', width: 30 },
         ];
 
         // Create a new workbook and a new worksheet
