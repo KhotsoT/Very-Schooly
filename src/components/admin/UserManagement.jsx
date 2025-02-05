@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc, deleteDoc, where, getDoc, setDoc, addDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/config';
-// import DashboardLayout from '../modals/layouts/DashboardLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AddUserModal from './modals/AddUserModal';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import ConfirmationModal from '../modals/ConfirmationModal';
+import { parse } from 'papaparse'; // Importing papaparse for CSV parsing
+import UserUploadTemplate from './UserUploadTemplate'; // Import the new template component
 
 const UserManagement = () => {
     const [user] = useAuthState(auth); // Get the current user
@@ -20,6 +21,7 @@ const UserManagement = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [userTypeFilter, setUserTypeFilter] = useState('all'); // State for user type filter
+    const [bulkUploadFile, setBulkUploadFile] = useState(null); // State for bulk upload file
 
     const roles = ['all', 'learner', 'educator', 'parent', 'admin', 'principal'];
     const statusOptions = ['pending', 'active', 'inactive', 'suspended'];
@@ -104,6 +106,29 @@ const UserManagement = () => {
         setShowAddUserModal(true);
     };
 
+    const handleBulkUpload = async () => {
+        if (!bulkUploadFile) {
+            setError('Please select a file to upload.');
+            return;
+        }
+
+        try {
+            const text = await bulkUploadFile.text();
+            const parsedData = parse(text, { header: true }).data; // Parse CSV data
+
+            // Process each user and add to Firestore
+            for (const user of parsedData) {
+                await addDoc(collection(db, 'users'), user);
+            }
+
+            fetchUsers(); // Refresh the user list
+            setBulkUploadFile(null); // Reset the file input
+        } catch (error) {
+            console.error('Error uploading users:', error);
+            setError('Failed to upload users');
+        }
+    };
+
     const filteredUsers = users.filter(user => {
         const matchesType = userTypeFilter === 'all' || user.userType === userTypeFilter;
         const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -117,21 +142,18 @@ const UserManagement = () => {
                 <h2 className="text-2xl font-bold">User Management</h2>
                 {error && <div className="text-red-500">{error}</div>}
                 <div className="flex justify-between">
+                    <UserUploadTemplate /> {/* Add the download button for the template */}
                     <input
-                        type="text"
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => setBulkUploadFile(e.target.files[0])}
                         className="border rounded p-2"
                     />
                     <button
-                        onClick={() => {
-                            setSelectedUser(null);
-                            setShowAddUserModal(true);
-                        }}
+                        onClick={handleBulkUpload}
                         className="bg-blue-500 text-white rounded p-2"
                     >
-                        Add User
+                        Upload Users
                     </button>
                 </div>
                 {/* User Type Filter Dropdown */}
