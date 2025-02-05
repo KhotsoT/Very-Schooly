@@ -36,20 +36,22 @@ const DashboardLayout = ({ children, userType }) => {
                     { title: 'Reports', path: '/admin-dashboard/reports' },
                     { title: 'Settings', path: '/admin-dashboard/settings' },
                 ];
-            case 'teacher':
+            case 'educator':
                 return [
-                    { title: 'Dashboard', path: '/teacher-dashboard' },
-                    { title: 'Classes', path: '/teacher-dashboard/classes' },
-                    { title: 'Students', path: '/teacher-dashboard/students' },
-                    { title: 'Grades', path: '/teacher-dashboard/grades' },
+                    { title: 'Dashboard', path: '/educator-dashboard' },
+                    { title: 'Classes', path: '/educator-dashboard/classes' },
+                    { title: 'Students', path: '/educator-dashboard/students' },
+                    { title: 'Grades', path: '/educator-dashboard/grades' },
                 ];
-            case 'student':
+
+            case 'learner':
                 return [
-                    { title: 'Dashboard', path: '/student-dashboard' },
-                    { title: 'Courses', path: '/student-dashboard/courses' },
-                    { title: 'Grades', path: '/student-dashboard/grades' },
-                    { title: 'Assignments', path: '/student-dashboard/assignments' },
+                    { title: 'Dashboard', path: '/learner-dashboard' },
+                    { title: 'Courses', path: '/learner-dashboard/courses' },
+                    { title: 'Grades', path: '/learner-dashboard/grades' },
+                    { title: 'Assignments', path: '/learner-dashboard/assignments' },
                 ];
+
             case 'parent':
                 return [
                     { title: 'Dashboard', path: '/parent-dashboard' },

@@ -1,17 +1,53 @@
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import { getCurrentTerm, formatDate } from '../utils/saSchoolCalendar';
+import { db } from '../firebase/config'; // Import Firestore db
+import { collection, getDocs } from 'firebase/firestore';
 
 const PrincipalDashboard = () => {
     const currentTerm = getCurrentTerm();
     const navigate = useNavigate();
-    const [stats] = useState({
-        totalStudents: 450,
-        totalTeachers: 25,
-        totalClasses: 15,
-        averageAttendance: '92%'
+    const [stats, setStats] = useState({
+        totalLearners: 0,
+        totalEducators: 0,
+        totalClasses: 0,
+        averageAttendance: '0%'
     });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch learners
+                const learnersSnapshot = await getDocs(collection(db, 'users'));
+                const totalLearners = learnersSnapshot.docs.filter(doc => 
+                    doc.data().userType === 'learner' && doc.data().status === 'active' // Check for active learners
+                ).length;
+
+                // Fetch educators
+                const educatorsSnapshot = await getDocs(collection(db, 'users'));
+                const totalEducators = educatorsSnapshot.docs.filter(doc => 
+                    doc.data().userType === 'educator' && doc.data().status === 'active' // Check for active educators
+                ).length;
+
+                // Fetch classes
+                const classesSnapshot = await getDocs(collection(db, 'classes'));
+                const totalClasses = classesSnapshot.size;
+
+                setStats({
+                    totalLearners: totalLearners,
+                    totalEducators: totalEducators,
+                    totalClasses: totalClasses,
+                    averageAttendance: '92%' // Replace with actual calculation if needed
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const handleNavigation = (path) => {
         navigate(`/principal-dashboard/${path}`);
@@ -24,12 +60,12 @@ const PrincipalDashboard = () => {
                 {/* Stats Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="bg-white p-6 rounded-lg shadow-sm">
-                        <h3 className="text-gray-500 text-sm font-medium">Total Students</h3>
-                        <p className="text-2xl font-bold mt-2">{stats.totalStudents}</p>
+                        <h3 className="text-gray-500 text-sm font-medium">Total Learners</h3>
+                        <p className="text-2xl font-bold mt-2">{stats.totalLearners}</p>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-sm">
-                        <h3 className="text-gray-500 text-sm font-medium">Total Teachers</h3>
-                        <p className="text-2xl font-bold mt-2">{stats.totalTeachers}</p>
+                        <h3 className="text-gray-500 text-sm font-medium">Total Educators</h3>
+                        <p className="text-2xl font-bold mt-2">{stats.totalEducators}</p>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-sm">
                         <h3 className="text-gray-500 text-sm font-medium">Total Classes</h3>
