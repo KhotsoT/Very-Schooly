@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, setPersistence, browserLocalPersistence, sendEmailVerification } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence, sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
 import {
     initializeFirestore,
     persistentLocalCache,
@@ -9,7 +9,8 @@ import {
     doc,
     collection,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    setDoc
 } from 'firebase/firestore';
 
 // Verify environment variables are loaded
@@ -101,13 +102,27 @@ export const actionCodeSettings = {
     dynamicLinkDomain: import.meta.env.VITE_FIREBASE_DYNAMIC_LINK_DOMAIN || undefined
 };
 
-// Add this function to handle email verification
-export const handleEmailVerification = async (user) => {
+// Function to handle email verification
+export const handleEmailVerification = async (user, tempPassword, redirectUrl) => {
+    const actionCodeSettings = {
+        // Add state parameter to maintain user type information
+        url: `${redirectUrl}?email=${user.email}&userType=${encodeURIComponent(user.userType)}`,
+        handleCodeInApp: true,
+    };
+
     try {
-        await sendEmailVerification(user, actionCodeSettings);
+        // Send password reset email first
+        await sendPasswordResetEmail(auth, user.email, actionCodeSettings);
+        
+        // Set custom claims or additional user data if needed
+        await setDoc(doc(db, 'userSettings', user.uid), {
+            lastPasswordReset: new Date().toISOString(),
+            redirectUrl: redirectUrl
+        }, { merge: true });
+        
         return true;
     } catch (error) {
-        console.error('Error sending verification email:', error);
+        console.error('Error sending password reset email:', error);
         return false;
     }
 };

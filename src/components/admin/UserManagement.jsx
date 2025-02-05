@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc, deleteDoc, where, getDoc, setDoc, addDoc } from 'firebase/firestore';
-import { db, auth } from '../../firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { db, auth, handleEmailVerification } from '../../firebase/config';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AddUserModal from './modals/AddUserModal';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { parse } from 'papaparse'; // Importing papaparse for CSV parsing
 import UserUploadTemplate from './UserUploadTemplate'; // Import the new template component
-import { handleEmailVerification } from '../../firebase/config';
+import * as XLSX from 'xlsx'; // Import xlsx for handling Excel files
 
 const UserManagement = () => {
     const [user] = useAuthState(auth); // Get the current user
@@ -44,26 +45,26 @@ const UserManagement = () => {
     }, [user]);
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            setLoading(true);
-            try {
-                const usersQuery = query(collection(db, 'users'));
-                const snapshot = await getDocs(usersQuery);
-                const usersData = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setUsers(usersData);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                setError('Failed to fetch users');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUsers();
+        fetchUsers(); // Fetch users on component mount
     }, []);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const usersQuery = query(collection(db, 'users'));
+            const snapshot = await getDocs(usersQuery);
+            const usersData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setUsers(usersData);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            setError('Failed to fetch users');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleAddUser = async (newUser) => {
         try {
@@ -114,38 +115,74 @@ const UserManagement = () => {
         }
 
         try {
-            const text = await bulkUploadFile.text();
-            const parsedData = parse(text, { header: true }).data; // Parse CSV data
+            const data = await bulkUploadFile.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const parsedData = XLSX.utils.sheet_to_json(worksheet);
 
-            // Process each user and add to Firestore
-            for (const user of parsedData) {
-                const userRef = doc(db, 'users', user.email); // Assuming email is unique
-                await setDoc(userRef, {
-                    email: user.email,
-                    name: user.name,
-                    surname: user.surname,
-                    idNumber: user.idNumber,
-                    userType: user.userType,
-                    cellphone: user.cellphone,
-                    address: user.address,
-                    emailVerified: user.userType === 'learner', // Set to true if learner
-                    status: user.userType === 'learner' ? 'active' : 'pending', // Set status based on userType
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                });
+            let successCount = 0;
+            let errorCount = 0;
 
-                // Send email verification if userType is not 'learner'
-                if (user.userType !== 'learner') {
-                    const userCredential = await auth.createUserWithEmailAndPassword(user.email, user.password);
-                    await handleEmailVerification(userCredential.user);
+            for (const userData of parsedData) {
+                try {
+                    if (!userData['Email'] || !userData['Name'] || !userData['Surname'] || !userData['User Type']) {
+                        console.error('Missing required fields:', userData);
+                        errorCount++;
+                        continue;
+                    }
+
+                    const userType = String(userData['User Type']).toLowerCase();
+                    const isLearner = userType === 'learner';
+                    const tempPassword = Math.random().toString(36).slice(-8);
+
+                    // Create Authentication User
+                    const userCredential = await createUserWithEmailAndPassword(
+                        auth,
+                        userData['Email'],
+                        tempPassword
+                    );
+
+                    // Create Firestore Document
+                    await setDoc(doc(db, 'users', userCredential.user.uid), {
+                        email: userData['Email'],
+                        name: userData['Name'],
+                        surname: userData['Surname'],
+                        idNumber: userData['ID Number'] || '',
+                        userType: userType,
+                        cellphone: userData['Cellphone'] || '',
+                        address: userData['Address'] || '',
+                        emailVerified: isLearner,
+                        status: isLearner ? 'active' : 'pending',
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                    });
+
+                    // Send verification email if not a learner
+                    if (!isLearner) {
+                        const redirectUrl = `${window.location.origin}/${userType}-dashboard`;
+                        await handleEmailVerification(userCredential.user, tempPassword, redirectUrl);
+                    }
+
+                    successCount++;
+
+                } catch (userError) {
+                    console.error(`Error processing user ${userData['Email']}:`, userError);
+                    errorCount++;
                 }
             }
 
-            fetchUsers(); // Refresh the user list
-            setBulkUploadFile(null); // Reset the file input
+            if (successCount > 0) {
+                alert(`Successfully processed ${successCount} users.${errorCount > 0 ? ` Failed to process ${errorCount} users.` : ''}`);
+                await fetchUsers();
+            } else {
+                setError('No users were processed successfully.');
+            }
+            
+            setBulkUploadFile(null);
+
         } catch (error) {
             console.error('Error uploading users:', error);
-            setError('Failed to upload users');
+            setError('Failed to upload users. Please check the console for details.');
         }
     };
 
@@ -165,7 +202,7 @@ const UserManagement = () => {
                     <UserUploadTemplate /> {/* Add the download button for the template */}
                     <input
                         type="file"
-                        accept=".csv"
+                        accept=".xlsx, .xls" // Accept Excel files
                         onChange={(e) => setBulkUploadFile(e.target.files[0])}
                         className="border rounded p-2"
                     />
